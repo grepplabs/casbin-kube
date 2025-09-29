@@ -1,0 +1,10 @@
+---
+apiVersion: casbin.grepplabs.com/v1alpha1
+kind: Rule
+metadata:
+  name: rule-sample
+spec:
+  ptype: "p"
+  v0: "alice"
+  v1: "data"
+  v2: "read"

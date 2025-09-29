@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: casbin-rule-viewer-role
+rules:
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules/status
+    verbs:
+      - get

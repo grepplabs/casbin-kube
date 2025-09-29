@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: casbin-kube-example
+  name: casbin-kube-example
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: casbin-kube-example
+  template:
+    metadata:
+      labels:
+        app: casbin-kube-example
+    spec:
+      serviceAccountName: casbin-kube-example
+      containers:
+      - image: grepplabs/casbin-kube-example:latest
+        imagePullPolicy: Never
+        name: casbin-kube-example

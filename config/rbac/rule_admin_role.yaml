@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: casbin-rule-admin-role
+rules:
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules
+    verbs:
+      - '*'
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules/status
+    verbs:
+      - get

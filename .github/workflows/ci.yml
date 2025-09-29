@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ['1.24', '1.25']
+        kind_node: ['kindest/node:v1.32.8', 'kindest/node:v1.33.4']
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Lint
+        run: make lint
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1
+        with:
+          version: 'v0.29.0'
+          node_image: ${{ matrix.kind_node }}
+          cluster_name: casbin-kube
+      - name: Install CRDs
+        shell: bash
+        run: |
+           set -euo pipefail
+
+           kubectl apply -k config/crds --force-conflicts --server-side=true
+           kubectl apply -k config/rbac --force-conflicts --server-side=true
+      - name: Test
+        run: make test
+      - name: Benchmark
+        run: make benchmark
+      - name: Test example in cluster
+        run: make example-docker-build example-deploy

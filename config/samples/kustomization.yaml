@@ -1,0 +1,2 @@
+resources:
+  - casbin_v1alpha1_rule.yaml

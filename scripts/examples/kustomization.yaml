@@ -1,0 +1,6 @@
+resources:
+  - ../../config/crds
+  - ../../config/rbac
+  - deploy/serviceaccount.yaml
+  - deploy/rbac.yaml
+  - deploy/deployment.yaml

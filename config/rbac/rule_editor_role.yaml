@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: casbin-rule-editor-role
+rules:
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - casbin.grepplabs.com
+    resources:
+      - rules/status
+    verbs:
+      - get
