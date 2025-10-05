@@ -1,6 +1,7 @@
 package casbinkube
 
 import (
+	"context"
 	"log"
 	"sort"
 	"testing"
@@ -9,6 +10,7 @@ import (
 	"github.com/casbin/casbin/v2/model"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/util"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,6 +44,47 @@ func TestExample(t *testing.T) {
 
 	err = adapter.LoadPolicy(m)
 	require.NoError(t, err)
+}
+
+func TestLabels(t *testing.T) {
+	labels := map[string]string{
+		"label1": "value1",
+		"label2": "value2",
+	}
+	ac := &AdapterConfig{
+		KubeConfig: KubeConfig{
+			Labels: labels,
+		},
+	}
+	adapter, err := NewAdapter(ac)
+	require.NoError(t, err)
+	e, err := casbin.NewEnforcer("examples/rbac_model.conf", adapter)
+	require.NoError(t, err)
+
+	userId := "user-" + uuid.NewString()
+
+	ok, err := e.AddPolicy(userId, "data1", "read")
+	require.NoError(t, err)
+	require.True(t, ok)
+
+	k8s, err := newK8sAdapter(ac)
+	require.NoError(t, err)
+
+	cr, err := k8s.k8sClient.Get(context.Background(), keyFor(CasbinRule{
+		PType: "p",
+		V0:    userId,
+		V1:    "data1",
+		V2:    "read",
+	}))
+	require.NoError(t, err)
+	require.Equal(t, cr.GetLabels(), labels)
+	require.Equal(t, "p", cr.Spec.PType)
+	require.Equal(t, cr.Spec.V0, userId)
+	require.Equal(t, "data1", cr.Spec.V1)
+	require.Equal(t, "read", cr.Spec.V2)
+	require.Empty(t, cr.Spec.V3)
+	require.Empty(t, cr.Spec.V4)
+	require.Empty(t, cr.Spec.V5)
 }
 
 func testGetPolicy(t *testing.T, e *casbin.Enforcer, res [][]string) {

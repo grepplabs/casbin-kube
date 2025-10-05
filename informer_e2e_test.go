@@ -10,18 +10,18 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/google/uuid"
-	"github.com/grepplabs/casbin-kube/pkg/logger"
+	"github.com/grepplabs/loggo/zlog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func TestE2E(t *testing.T) { //nolint:funlen
-	logger.Init(logger.LogConfig{
+	zlog.Init(zlog.LogConfig{
 		Level:  "debug",
 		Format: "text",
 	})
-	ctrl.SetLogger(logger.Logger)
+	ctrl.SetLogger(zlog.Logger)
 
 	adapter, err := NewAdapter(&AdapterConfig{})
 	require.NoError(t, err)
@@ -84,11 +84,11 @@ func TestE2E(t *testing.T) { //nolint:funlen
 func TestK8sInformer(t *testing.T) {
 	t.SkipNow()
 
-	logger.Init(logger.LogConfig{
+	zlog.Init(zlog.LogConfig{
 		Level:  "debug",
 		Format: "",
 	})
-	ctrl.SetLogger(logger.Logger)
+	ctrl.SetLogger(zlog.Logger)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

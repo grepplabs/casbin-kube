@@ -22,17 +22,20 @@ func init() {
 
 const (
 	DefaultGracePeriodSeconds = 0
+	DefaultNamespace          = "default"
 )
 
 type KubeConfig struct {
 	Context   string
 	Namespace string
 	Path      string
+	Labels    map[string]string
 }
 
 type k8sClient[T client.Object, L client.ObjectList] struct {
 	Client    client.Client
 	Namespace string
+	Labels    map[string]string
 	New       func() T
 	NewList   func() L
 }
@@ -40,6 +43,9 @@ type k8sClient[T client.Object, L client.ObjectList] struct {
 func (k *k8sClient[T, L]) Create(ctx context.Context, obj T, opts ...client.CreateOption) error {
 	if obj.GetNamespace() == "" {
 		obj.SetNamespace(k.Namespace)
+	}
+	if len(k.Labels) != 0 {
+		obj.SetLabels(mergeLabels(obj.GetLabels(), k.Labels))
 	}
 	return k.Client.Create(ctx, obj, opts...)
 }
@@ -54,6 +60,9 @@ func (k *k8sClient[T, L]) Get(ctx context.Context, name string) (T, error) {
 }
 
 func (k *k8sClient[T, L]) Update(ctx context.Context, obj T, opts ...client.UpdateOption) error {
+	if len(k.Labels) != 0 {
+		obj.SetLabels(mergeLabels(obj.GetLabels(), k.Labels))
+	}
 	return k.Client.Update(ctx, obj, opts...)
 }
 
@@ -124,4 +133,17 @@ func getRESTConfig(kubeConfig KubeConfig) (*rest.Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func mergeLabels(maps ...map[string]string) map[string]string {
+	out := make(map[string]string)
+	for _, m := range maps {
+		if m == nil {
+			continue
+		}
+		for k, v := range m {
+			out[k] = v
+		}
+	}
+	return out
 }

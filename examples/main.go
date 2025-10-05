@@ -10,18 +10,18 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
+	"github.com/grepplabs/loggo/zlog"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	casbinkube "github.com/grepplabs/casbin-kube"
-	"github.com/grepplabs/casbin-kube/pkg/logger"
 )
 
 //go:embed *.conf
 var FS embed.FS
 
 func main() {
-	logger.Init(logger.LogConfig{Level: "debug", Format: "text"})
-	ctrl.SetLogger(logger.Logger)
+	zlog.Init(zlog.LogConfig{Level: "debug", Format: "text"})
+	ctrl.SetLogger(zlog.Logger)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -54,7 +54,7 @@ func noError[T any](t T, err error) T {
 
 func checkNoError(err error) {
 	if err != nil {
-		logger.Fatalf("unexpected error: %v", err)
+		zlog.Fatalf("unexpected error: %v", err)
 	}
 }
 

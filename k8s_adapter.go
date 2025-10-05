@@ -24,7 +24,7 @@ func newK8sAdapter(config *AdapterConfig) (*k8sAdapter, error) {
 	}
 	namespace := kubeConfig.Namespace
 	if namespace == "" {
-		namespace = "default"
+		namespace = DefaultNamespace
 	}
 	kc := &k8sClient[*v1alpha1.Rule, *v1alpha1.RuleList]{
 		New: func() *v1alpha1.Rule {
@@ -35,6 +35,7 @@ func newK8sAdapter(config *AdapterConfig) (*k8sAdapter, error) {
 		},
 		Client:    c,
 		Namespace: namespace,
+		Labels:    kubeConfig.Labels,
 	}
 	return &k8sAdapter{
 		k8sClient: kc,

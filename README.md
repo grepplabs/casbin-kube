@@ -87,13 +87,13 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	casbinkube "github.com/grepplabs/casbin-kube"
-	"github.com/grepplabs/casbin-kube/pkg/logger"
+	"github.com/grepplabs/loggo/zlog"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func main() {
-	logger.Init(logger.LogConfig{Level: "debug", Format: "text"})
-	ctrl.SetLogger(logger.Logger)
+	zlog.Init(zlog.LogConfig{Level: "debug", Format: "text"})
+	ctrl.SetLogger(zlog.Logger)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

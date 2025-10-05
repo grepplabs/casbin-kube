@@ -8,7 +8,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/grepplabs/casbin-kube/api/v1alpha1"
-	"github.com/grepplabs/casbin-kube/pkg/logger"
+	"github.com/grepplabs/loggo/zlog"
 	"k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	crcache "sigs.k8s.io/controller-runtime/pkg/cache"
@@ -37,7 +37,7 @@ func NewInformer(config *InformerConfig, e casbin.IEnforcer) (*Informer, error) 
 	}
 	kubeConfig := config.KubeConfig
 	if kubeConfig.Namespace == "" {
-		kubeConfig.Namespace = "default"
+		kubeConfig.Namespace = DefaultNamespace
 	}
 	if !config.SkipDisableAuto {
 		e.EnableAutoSave(false) // must be set for readonly i.e. when it is used with informer
@@ -54,7 +54,7 @@ func (w *Informer) Start(ctx context.Context) error { //nolint:cyclop,funlen
 	ctx, cancel := context.WithCancel(ctx)
 	w.stop = cancel
 
-	ctrl.SetLogger(logger.Logger)
+	ctrl.SetLogger(zlog.Logger)
 
 	cfg, err := getRESTConfig(w.kubeConfig)
 	if err != nil {
@@ -81,10 +81,10 @@ func (w *Informer) Start(ctx context.Context) error { //nolint:cyclop,funlen
 				if isInInitialList {
 					level = 1 // debug
 				}
-				logger.Vf(level, "ADD(%t) %s/%s ptype=%s v0=%s", isInInitialList, r.Namespace, r.Name, r.Spec.PType, r.Spec.V0)
+				zlog.Vf(level, "ADD(%t) %s/%s ptype=%s v0=%s", isInInitialList, r.Namespace, r.Name, r.Spec.PType, r.Spec.V0)
 				_, err := w.enforcer.SelfAddPolicy(toPolicyParams(r))
 				if err != nil {
-					logger.Errorf("add policy err: %s", err)
+					zlog.Errorf("add policy err: %s", err)
 				}
 			}
 		},
@@ -92,21 +92,21 @@ func (w *Informer) Start(ctx context.Context) error { //nolint:cyclop,funlen
 			rNew, ok1 := newObj.(*v1alpha1.Rule)
 			rOld, ok2 := oldObj.(*v1alpha1.Rule)
 			if ok1 && ok2 {
-				logger.Infof("UPDATE %s/%s ptype=%s v0=%s", rNew.Namespace, rNew.Name, rNew.Spec.PType, rNew.Spec.V0)
+				zlog.Infof("UPDATE %s/%s ptype=%s v0=%s", rNew.Namespace, rNew.Name, rNew.Spec.PType, rNew.Spec.V0)
 				sec, ptype, newRule := toPolicyParams(rNew)
 				oldRule := toPolicyRuleArray(rOld)
 				_, err := w.enforcer.SelfUpdatePolicy(sec, ptype, oldRule, newRule)
 				if err != nil {
-					logger.Errorf("update policy err: %s", err)
+					zlog.Errorf("update policy err: %s", err)
 				}
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			if r, ok := obj.(*v1alpha1.Rule); ok {
-				logger.Infof("DELETE %s/%s ptype=%s v0=%s", r.Namespace, r.Name, r.Spec.PType, r.Spec.V0)
+				zlog.Infof("DELETE %s/%s ptype=%s v0=%s", r.Namespace, r.Name, r.Spec.PType, r.Spec.V0)
 				_, err := w.enforcer.SelfRemovePolicy(toPolicyParams(r))
 				if err != nil {
-					logger.Errorf("remoove policy err: %s", err)
+					zlog.Errorf("remoove policy err: %s", err)
 				}
 			}
 		},
@@ -115,17 +115,17 @@ func (w *Informer) Start(ctx context.Context) error { //nolint:cyclop,funlen
 		return fmt.Errorf("adds an event handler err: %w", err)
 	}
 	go func() {
-		defer logger.Infof("informer stopped")
+		defer zlog.Infof("informer stopped")
 
 		if err := c.Start(ctx); err != nil {
-			logger.Fatalf("informer start failed: %v", err)
+			zlog.Fatalf("informer start failed: %v", err)
 		}
 	}()
-	logger.Infof("wait for the informer to sync")
+	zlog.Infof("wait for the informer to sync")
 	if ok := cache.WaitForCacheSync(ctx.Done(), reg.HasSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync: %w", err)
 	}
-	logger.Infof("informer started")
+	zlog.Infof("informer started")
 	return nil
 }
 func (w *Informer) Close() {

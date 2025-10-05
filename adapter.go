@@ -7,7 +7,7 @@ import (
 
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
-	"github.com/grepplabs/casbin-kube/pkg/logger"
+	"github.com/grepplabs/loggo/zlog"
 )
 
 // CasbinRule is used to determine which policy line to load.
@@ -91,12 +91,12 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 
 func (a *Adapter) LoadPolicyCtx(ctx context.Context, model model.Model) error {
 	defer logDuration("loading policies", time.Now())
-	logger.Debugw("loading policies")
+	zlog.Debugw("loading policies")
 	lines, err := a.store.GetAllPolicies(ctx)
 	if err != nil {
 		return err
 	}
-	logger.Infow("loading policies count", "count", len(lines))
+	zlog.Infow("loading policies count", "count", len(lines))
 	for _, line := range lines {
 		err := loadPolicyLine(line, model)
 		if err != nil {
@@ -114,7 +114,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 // SavePolicyCtx saves policy to the storage.
 func (a *Adapter) SavePolicyCtx(ctx context.Context, model model.Model) error {
 	defer logDuration("saving policies", time.Now())
-	logger.Debugw("saving policies")
+	zlog.Debugw("saving policies")
 
 	err := a.store.DeleteAllPolicies(ctx)
 	if err != nil {
@@ -235,5 +235,5 @@ func (a *Adapter) checkQueryField(fieldValues []string) error {
 }
 
 func logDuration(name string, start time.Time) {
-	logger.Infof("finished %s, elapsed=%v", name, time.Since(start))
+	zlog.Infof("finished %s, elapsed=%v", name, time.Since(start))
 }
