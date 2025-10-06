@@ -9,9 +9,11 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/grepplabs/casbin-kube/api/v1alpha1"
 	"github.com/grepplabs/loggo/zlog"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	crcache "sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type InformerConfig struct {
@@ -60,13 +62,21 @@ func (w *Informer) Start(ctx context.Context) error { //nolint:cyclop,funlen
 	if err != nil {
 		return fmt.Errorf("get rest config err: %w", err)
 	}
-	c, err := crcache.New(cfg, crcache.Options{
+	opts := crcache.Options{
 		Scheme: scheme,
 		DefaultNamespaces: map[string]crcache.Config{
 			w.kubeConfig.Namespace: {},
 		},
-		SyncPeriod: w.syncPeriod, // nil is normal use case to disable periodic resync
-	})
+		SyncPeriod: w.syncPeriod, // nil disables periodic resync (normal)
+	}
+	if len(w.kubeConfig.Labels) > 0 {
+		opts.ByObject = map[client.Object]crcache.ByObject{
+			&v1alpha1.Rule{}: {
+				Label: labels.SelectorFromSet(w.kubeConfig.Labels),
+			},
+		}
+	}
+	c, err := crcache.New(cfg, opts)
 	if err != nil {
 		return fmt.Errorf("create cache err: %w", err)
 	}

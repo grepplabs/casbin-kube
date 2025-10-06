@@ -67,7 +67,7 @@ func (k *k8sClient[T, L]) Update(ctx context.Context, obj T, opts ...client.Upda
 }
 
 func (k *k8sClient[T, L]) Delete(ctx context.Context, obj T, opts ...client.DeleteOption) error {
-	if obj.GetNamespace() == "" && k.Namespace != "" {
+	if obj.GetNamespace() == "" {
 		obj.SetNamespace(k.Namespace)
 	}
 	deleteOpts := append([]client.DeleteOption{client.GracePeriodSeconds(DefaultGracePeriodSeconds)}, opts...)
@@ -75,8 +75,10 @@ func (k *k8sClient[T, L]) Delete(ctx context.Context, obj T, opts ...client.Dele
 }
 
 func (k *k8sClient[T, L]) DeleteAllOf(ctx context.Context, obj T, opts ...client.DeleteAllOfOption) error {
-	deleteOpts := []client.DeleteAllOfOption{
-		client.GracePeriodSeconds(DefaultGracePeriodSeconds),
+	deleteOpts := []client.DeleteAllOfOption{client.GracePeriodSeconds(DefaultGracePeriodSeconds)}
+
+	if len(k.Labels) > 0 {
+		deleteOpts = append(deleteOpts, client.MatchingLabels(k.Labels))
 	}
 	ns := obj.GetNamespace()
 	if ns == "" {
@@ -89,7 +91,11 @@ func (k *k8sClient[T, L]) DeleteAllOf(ctx context.Context, obj T, opts ...client
 
 func (k *k8sClient[T, L]) List(ctx context.Context, opts ...client.ListOption) (L, error) {
 	list := k.NewList()
-	listOpts := append([]client.ListOption{client.InNamespace(k.Namespace)}, opts...)
+	listOpts := []client.ListOption{client.InNamespace(k.Namespace)}
+	if len(k.Labels) > 0 {
+		listOpts = append(listOpts, client.MatchingLabels(k.Labels))
+	}
+	listOpts = append(listOpts, opts...)
 	err := k.Client.List(ctx, list, listOpts...)
 	return list, err
 }

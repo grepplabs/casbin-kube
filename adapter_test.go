@@ -51,26 +51,14 @@ func TestLabels(t *testing.T) {
 		"label1": "value1",
 		"label2": "value2",
 	}
-	ac := &AdapterConfig{
-		KubeConfig: KubeConfig{
-			Labels: labels,
-		},
-	}
-	adapter, err := NewAdapter(ac)
-	require.NoError(t, err)
-	e, err := casbin.NewEnforcer("examples/rbac_model.conf", adapter)
-	require.NoError(t, err)
 
+	env := newTestEnv(t, labels, false)
 	userId := "user-" + uuid.NewString()
 
-	ok, err := e.AddPolicy(userId, "data1", "read")
-	require.NoError(t, err)
-	require.True(t, ok)
+	ok, err := env.enforcer.AddPolicy(userId, "data1", "read")
+	requireTrue(t, ok, err)
 
-	k8s, err := newK8sAdapter(ac)
-	require.NoError(t, err)
-
-	cr, err := k8s.k8sClient.Get(context.Background(), keyFor(CasbinRule{
+	cr, err := env.k8sAdapter.k8sClient.Get(context.Background(), keyFor(CasbinRule{
 		PType: "p",
 		V0:    userId,
 		V1:    "data1",
@@ -85,6 +73,85 @@ func TestLabels(t *testing.T) {
 	require.Empty(t, cr.Spec.V3)
 	require.Empty(t, cr.Spec.V4)
 	require.Empty(t, cr.Spec.V5)
+}
+
+func TestLabelSelector(t *testing.T) { //nolint:funlen
+	labels1 := map[string]string{
+		"label-selector": "value1",
+	}
+	labels2 := map[string]string{
+		"label-selector": "value2",
+	}
+	env1 := newTestEnv(t, labels1, true)
+	env2 := newTestEnv(t, labels2, true)
+
+	// add policies
+	userId1 := "user-" + uuid.NewString()
+	ok, err := env1.enforcer.AddPolicy(userId1, "data1", "read")
+	requireTrue(t, ok, err)
+
+	userId2 := "user-" + uuid.NewString()
+	ok, err = env2.enforcer.AddPolicy(userId2, "data1", "read")
+	requireTrue(t, ok, err)
+
+	// enforce
+	testEnforce := func() {
+		ok, err = env1.enforcer.Enforce(userId1, "data1", "read")
+		requireTrue(t, ok, err)
+
+		ok, err = env1.enforcer.Enforce(userId2, "data1", "read")
+		requireFalse(t, ok, err)
+
+		ok, err = env2.enforcer.Enforce(userId1, "data1", "read")
+		requireFalse(t, ok, err)
+
+		ok, err = env2.enforcer.Enforce(userId2, "data1", "read")
+		requireTrue(t, ok, err)
+	}
+	testEnforce()
+
+	// new env
+	env1 = newTestEnv(t, labels1, false)
+	env2 = newTestEnv(t, labels2, false)
+
+	testEnforce()
+
+	// remove 1st
+	ok, err = env1.enforcer.RemovePolicy(userId1, "data1", "read")
+	requireTrue(t, ok, err)
+
+	// enforce after remove
+	ok, err = env1.enforcer.Enforce(userId1, "data1", "read")
+	requireFalse(t, ok, err)
+
+	// second is untouched
+	ok, err = env2.enforcer.Enforce(userId2, "data1", "read")
+	requireTrue(t, ok, err)
+
+	// remove 2nd
+	ok, err = env2.enforcer.RemovePolicy(userId2, "data1", "read")
+	requireTrue(t, ok, err)
+
+	ok, err = env2.enforcer.Enforce(userId2, "data1", "read")
+	requireFalse(t, ok, err)
+
+	// add again
+	ok, err = env1.enforcer.AddPolicy(userId1, "data1", "read")
+	requireTrue(t, ok, err)
+
+	ok, err = env2.enforcer.AddPolicy(userId2, "data1", "read")
+	requireTrue(t, ok, err)
+
+	// clear 1st
+	env1.enforcer.ClearPolicy()
+
+	// enforce after clear
+	ok, err = env1.enforcer.Enforce(userId1, "data1", "read")
+	requireFalse(t, ok, err)
+
+	// second is untouched
+	ok, err = env2.enforcer.Enforce(userId2, "data1", "read")
+	requireTrue(t, ok, err)
 }
 
 func testGetPolicy(t *testing.T, e *casbin.Enforcer, res [][]string) {
@@ -278,4 +345,56 @@ func TestRemoveFilteredPolicy1(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []string{"alice", "bob"}, sub)
 	require.Equal(t, []string{"data2"}, obj)
+}
+
+type testEnv struct {
+	adapter    *Adapter
+	enforcer   *casbin.Enforcer
+	k8sAdapter *k8sAdapter
+}
+
+func newTestEnv(t *testing.T, labels map[string]string, clean bool) *testEnv {
+	t.Helper()
+
+	ac := &AdapterConfig{
+		KubeConfig: KubeConfig{
+			Labels: labels,
+		},
+	}
+	k8s, err := newK8sAdapter(ac)
+	require.NoError(t, err)
+
+	a, err := NewAdapter(ac)
+	require.NoError(t, err)
+
+	m, err := model.NewModelFromFile("examples/rbac_model.conf")
+	require.NoError(t, err)
+
+	if clean {
+		// empty model will delete data
+		require.NoError(t, a.SavePolicy(m))
+	} else {
+		require.NoError(t, a.LoadPolicy(m))
+	}
+
+	e, err := casbin.NewEnforcer("examples/rbac_model.conf", a)
+	require.NoError(t, err)
+
+	return &testEnv{
+		adapter:    a,
+		enforcer:   e,
+		k8sAdapter: k8s,
+	}
+}
+
+func requireTrue(t *testing.T, ok bool, err error) {
+	t.Helper()
+	require.NoError(t, err)
+	require.True(t, ok)
+}
+
+func requireFalse(t *testing.T, ok bool, err error) {
+	t.Helper()
+	require.NoError(t, err)
+	require.False(t, ok)
 }

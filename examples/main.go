@@ -20,7 +20,6 @@ import (
 var FS embed.FS
 
 func main() {
-	zlog.Init(zlog.LogConfig{Level: "debug", Format: "text"})
 	ctrl.SetLogger(zlog.Logger)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
