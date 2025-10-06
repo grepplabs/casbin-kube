@@ -51,12 +51,12 @@ func TestE2E(t *testing.T) {
 	requireTrue(t, added, err)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin.Enforce(sub, obj, act)
+		ok, err := admin.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "admin enforce true")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader.Enforce(sub, obj, act)
+		ok, err := reader.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "reader enforce true")
 
@@ -65,12 +65,12 @@ func TestE2E(t *testing.T) {
 	require.True(t, removed)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin.Enforce(sub, obj, act)
+		ok, err := admin.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "admin enforce false")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader.Enforce(sub, obj, act)
+		ok, err := reader.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "reader enforce false")
 }
@@ -136,38 +136,35 @@ func TestE2EDifferentLabels(t *testing.T) { //nolint:funlen
 	requireTrue(t, added, err)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin1.Enforce(sub, obj, act)
+		ok, err := admin1.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "admin1 enforce true")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader1.Enforce(sub, obj, act)
+		ok, err := reader1.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "reader1 enforce true")
 
 	assert.Never(t, func() bool {
-		ok, err = reader2.Enforce(sub, obj, act)
+		ok, err := reader2.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 2*time.Second, 500*time.Millisecond, "reader1 enforce false")
-
-	ok, err = reader2.Enforce(sub, obj, act)
-	requireFalse(t, ok, err)
 
 	removed, err := admin1.RemovePolicy(sub, obj, act)
 	requireTrue(t, removed, err)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin1.Enforce(sub, obj, act)
+		ok, err := admin1.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "admin1 enforce false")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader1.Enforce(sub, obj, act)
+		ok, err := reader1.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "reader1 enforce false")
 
 	assert.Never(t, func() bool {
-		ok, err = reader2.Enforce(sub, obj, act)
+		ok, err := reader2.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 2*time.Second, 500*time.Millisecond, "reader2 enforce false")
 }
@@ -228,17 +225,17 @@ func TestE2ESameLabels(t *testing.T) { //nolint:funlen
 	requireTrue(t, added, err)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin1.Enforce(sub, obj, act)
+		ok, err := admin1.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "admin1 enforce true")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader1.Enforce(sub, obj, act)
+		ok, err := reader1.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "reader1 enforce true")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader2.Enforce(sub, obj, act)
+		ok, err := reader2.Enforce(sub, obj, act)
 		return err == nil && ok
 	}, 3*time.Second, 500*time.Millisecond, "reader2 enforce true")
 
@@ -247,17 +244,17 @@ func TestE2ESameLabels(t *testing.T) { //nolint:funlen
 	require.True(t, removed)
 
 	assert.Eventually(t, func() bool {
-		ok, err = admin1.Enforce(sub, obj, act)
+		ok, err := admin1.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "admin1 enforce false")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader1.Enforce(sub, obj, act)
+		ok, err := reader1.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "reader1 enforce false")
 
 	assert.Eventually(t, func() bool {
-		ok, err = reader2.Enforce(sub, obj, act)
+		ok, err := reader2.Enforce(sub, obj, act)
 		return err == nil && !ok
 	}, 3*time.Second, 500*time.Millisecond, "reader2 enforce false")
 }
