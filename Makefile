@@ -20,6 +20,7 @@ GOLANGCI_LINT ?= $(GO_RUN) github.com/golangci/golangci-lint/v2/cmd/golangci-lin
 .PHONY: manifests
 manifests: ## Generate CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) crd paths="./api/..." output:crd:dir=config/crds
+	$(CONTROLLER_GEN) crd paths="./api/..." output:crd:dir=charts/casbin-kube/crds
 
 .PHONY: generate
 generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.

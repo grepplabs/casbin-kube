@@ -1,0 +1,119 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: rules.casbin.grepplabs.com
+spec:
+  group: casbin.grepplabs.com
+  names:
+    kind: Rule
+    listKind: RuleList
+    plural: rules
+    singular: rule
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.ptype
+      name: PType
+      type: string
+    - jsonPath: .spec.v0
+      name: V0
+      type: string
+    - jsonPath: .spec.v1
+      name: V1
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Rule is the Schema for the policies API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec defines the desired state of Rule
+            properties:
+              ptype:
+                description: 'Rule type: p, p2, g, g2, ...'
+                pattern: ^(p|g)\d*$
+                type: string
+                x-kubernetes-validations:
+                - message: ptype is immutable
+                  rule: self == oldSelf
+              v0:
+                description: Positional parameters v0
+                type: string
+                x-kubernetes-validations:
+                - message: v0 is immutable
+                  rule: self == oldSelf
+              v1:
+                description: Positional parameters v1
+                pattern: .*\S.*
+                type: string
+                x-kubernetes-validations:
+                - message: v1 is immutable
+                  rule: self == oldSelf
+              v2:
+                description: Positional parameters v2
+                type: string
+                x-kubernetes-validations:
+                - message: v2 is immutable
+                  rule: self == oldSelf
+              v3:
+                description: Positional parameters v3
+                type: string
+                x-kubernetes-validations:
+                - message: v3 is immutable
+                  rule: self == oldSelf
+              v4:
+                description: Positional parameters v4
+                type: string
+                x-kubernetes-validations:
+                - message: v4 is immutable
+                  rule: self == oldSelf
+              v5:
+                description: Positional parameters v5
+                type: string
+                x-kubernetes-validations:
+                - message: v5 is immutable
+                  rule: self == oldSelf
+            required:
+            - ptype
+            type: object
+          status:
+            description: status defines the observed state of Rule
+            type: object
+        required:
+        - spec
+        type: object
+    selectableFields:
+    - jsonPath: .spec.ptype
+    - jsonPath: .spec.v0
+    - jsonPath: .spec.v1
+    - jsonPath: .spec.v2
+    - jsonPath: .spec.v3
+    - jsonPath: .spec.v4
+    - jsonPath: .spec.v5
+    served: true
+    storage: true
+    subresources:
+      status: {}
