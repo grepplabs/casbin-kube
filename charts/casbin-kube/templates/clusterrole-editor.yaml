@@ -1,0 +1,26 @@
+{{- if and .Values.rbac.create .Values.rbac.roles.editor }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: casbin-rule-editor-role
+  labels:
+    {{- include "casbin-kube.labels" . | nindent 4 }}
+    {{- if .Values.rbac.aggregateTo.edit }}
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    {{- end }}
+rules:
+  - apiGroups: ["casbin.grepplabs.com"]
+    resources: ["rules"]
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups: ["casbin.grepplabs.com"]
+    resources: ["rules/status"]
+    verbs:
+      - get
+{{- end }}

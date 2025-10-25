@@ -1,4 +1,4 @@
 resources:
-  - rule_admin_role.yaml
-  - rule_editor_role.yaml
-  - rule_viewer_role.yaml
+  - clusterrole-admin.yaml
+  - clusterrole-editor.yaml
+  - clusterrole-viewer.yaml

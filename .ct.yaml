@@ -1,0 +1,9 @@
+---
+debug: false
+remote: origin
+lint-conf: ""
+target-branch: main
+check-version-increment: true
+validate-maintainers: false
+chart-dirs:
+  - charts/

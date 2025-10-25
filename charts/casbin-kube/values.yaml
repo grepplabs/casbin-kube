@@ -1,0 +1,10 @@
+rbac:
+  create: true
+  roles:
+    admin: true
+    editor: true
+    viewer: true
+  aggregateTo:
+    admin: false
+    edit: false
+    view: false

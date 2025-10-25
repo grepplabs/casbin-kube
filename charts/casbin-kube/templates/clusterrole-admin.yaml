@@ -1,0 +1,18 @@
+{{- if and .Values.rbac.create .Values.rbac.roles.admin }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: casbin-rule-admin-role
+  labels:
+    {{- include "casbin-kube.labels" . | nindent 4 }}
+    {{- if .Values.rbac.aggregateTo.admin }}
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    {{- end }}
+rules:
+  - apiGroups: ["casbin.grepplabs.com"]
+    resources: ["rules"]
+    verbs: ["*"]
+  - apiGroups: ["casbin.grepplabs.com"]
+    resources: ["rules/status"]
+    verbs: ["get"]
+{{- end }}

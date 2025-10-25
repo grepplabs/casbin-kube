@@ -16,6 +16,11 @@ You need to install the `rules.casbin.grepplabs.com` custom resource and grant a
 kubectl apply -k config/crds
 kubectl apply -k config/rbac
 ```
+or
+
+```
+helm install casbin-kube oci://ghcr.io/grepplabs/helm/casbin-kube:0.0.1
+```
 
 ## Installation
 

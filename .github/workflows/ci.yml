@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -40,3 +40,6 @@ jobs:
         run: make benchmark
       - name: Test example in cluster
         run: make example-docker-build example-deploy
+
+  verify-chart:
+    uses: ./.github/workflows/_verify-chart.yaml
