@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
+          check-latest: true
+          cache: true
       - name: Lint
         run: make lint
       - name: Create k8s Kind Cluster
