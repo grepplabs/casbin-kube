@@ -1,0 +1,4 @@
+/casbin-kube-converter
+*.yaml
+*.yml
+*.csv

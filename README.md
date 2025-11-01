@@ -22,6 +22,9 @@ or
 helm install casbin-kube oci://ghcr.io/grepplabs/helm/casbin-kube:0.0.1
 ```
 
+## Tools
+### [casbin-kube-converter](tools/cmd/casbin-kube-converter/README.md)
+
 ## Installation
 
     go get github.com/grepplabs/casbin-kube
