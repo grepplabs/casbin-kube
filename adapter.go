@@ -30,7 +30,8 @@ type Adapter struct {
 	store *k8sAdapter
 }
 
-var _ persist.BatchAdapter = &Adapter{}
+var _ persist.BatchAdapter = (*Adapter)(nil)
+var _ persist.ContextAdapter = (*Adapter)(nil)
 
 func NewAdapter(config *AdapterConfig) (*Adapter, error) {
 	if config == nil {
