@@ -3,6 +3,7 @@ Casbin Kube
 
 [![Build](https://github.com/grepplabs/casbin-kube/actions/workflows/ci.yml/badge.svg)](https://github.com/grepplabs/casbin-kube/actions/workflows/ci.yml)
 [![Godoc](https://godoc.org/github.com/casbin/casbin?status.svg)](https://pkg.go.dev/github.com/grepplabs/casbin-kube)
+[![Release](https://img.shields.io/github/v/release/grepplabs/casbin-kube?sort=semver)](https://github.com/grepplabs/casbin-kube/releases)
 
 Casbin Kube is the [Kubernetes](https://kubernetes.io/) adapter for [Casbin](https://github.com/casbin/casbin). This library allows Casbin to load policies from Kubernetes and save policies back to it
 
