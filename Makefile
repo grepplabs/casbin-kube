@@ -58,7 +58,7 @@ init-kind-cluster: export KUBECONFIG=tmp/casbin-kube-kubeconfig.yaml
 init-kind-cluster:
 	mkdir -p tmp
 	kind get clusters | grep '^casbin-kube$$' && kind export kubeconfig --name casbin-kube --kubeconfig tmp/casbin-kube-kubeconfig.yaml || \
-		kind create cluster --name casbin-kube --config scripts/kind/kubernetes-1.32.yaml --kubeconfig tmp/casbin-kube-kubeconfig.yaml
+		kind create cluster --name casbin-kube --config scripts/kind/kubernetes-1.34.yaml --kubeconfig tmp/casbin-kube-kubeconfig.yaml
 	kubectl apply -k config/crds --force-conflicts --server-side=true
 	kubectl apply -k config/rbac --force-conflicts --server-side=true
 

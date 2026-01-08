@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.24', '1.25']
-        kind_node: ['kindest/node:v1.32.8', 'kindest/node:v1.33.4']
+        go: ['1.25']
+        kind_node: ['kindest/node:v1.32.11', 'kindest/node:v1.33.7', 'kindest/node:v1.34.3', 'kindest/node:v1.35.0']
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -26,7 +26,7 @@ jobs:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1
         with:
-          version: 'v0.29.0'
+          version: 'v0.30.0'
           node_image: ${{ matrix.kind_node }}
           cluster_name: casbin-kube
       - name: Install CRDs
