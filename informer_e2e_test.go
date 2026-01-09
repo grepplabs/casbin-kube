@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/grepplabs/loggo/zlog"
 	"github.com/stretchr/testify/assert"

@@ -3,7 +3,7 @@ package casbinkube
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v3"
 	"github.com/grepplabs/casbin-kube/api/v1alpha1"
 	"github.com/stretchr/testify/require"
 )
