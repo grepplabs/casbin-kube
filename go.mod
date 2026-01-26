@@ -3,7 +3,7 @@ module github.com/grepplabs/casbin-kube
 go 1.24.7
 
 require (
-	github.com/casbin/casbin/v3 v3.9.0
+	github.com/casbin/casbin/v3 v3.10.0
 	github.com/google/uuid v1.6.0
 	github.com/grepplabs/loggo v0.0.3
 	github.com/stretchr/testify v1.11.1
