@@ -2,8 +2,8 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS += -o pipefail -O extglob
 .DEFAULT_GOAL := prepare
 
-CONTROLLER_TOOLS_VERSION := v0.19.0
-GOLANGCI_LINT_VERSION := v2.4.0
+CONTROLLER_TOOLS_VERSION := v0.20.1
+GOLANGCI_LINT_VERSION := v2.11.3
 
 ##@ General
 
